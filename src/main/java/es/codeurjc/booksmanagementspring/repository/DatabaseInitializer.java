@@ -1,10 +1,13 @@
 package es.codeurjc.booksmanagementspring.repository;
 
-import es.codeurjc.booksmanagementspring.model.Book;
-import es.codeurjc.booksmanagementspring.model.Review;
-import es.codeurjc.booksmanagementspring.model.User;
+import es.codeurjc.booksmanagementspring.model.*;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @Component
 public class DatabaseInitializer {
@@ -14,16 +17,21 @@ public class DatabaseInitializer {
 
     private final UserRepository userRepository;
 
-    public DatabaseInitializer(BookRepository bookRepository, ReviewRepository reviewRepository, UserRepository userRepository) {
+    private final RoleRepository roleRepository;
+
+    public DatabaseInitializer(BookRepository bookRepository, ReviewRepository reviewRepository, UserRepository userRepository,
+                               RoleRepository roleRepository) {
         this.bookRepository = bookRepository;
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     @PostConstruct
     public void init() {
         User user1 = new User("Alex", "alex@gmail.com");
         User user2 = new User("Jesus", "jesus@gmail.com");
+        user1.setPassword("1234");
 
         Book book1 = new Book("Tomás Nevinson",
                 "Dos hombres, uno en la ficción y otro en la realidad...",
@@ -62,5 +70,16 @@ public class DatabaseInitializer {
         reviewRepository.save(review2);
         reviewRepository.save(review3);
         reviewRepository.save(review4);
+
+        Role role1 = new Role(1, ERole.ROLE_USER);
+        Role role2 = new Role(2, ERole.ROLE_ADMIN);
+        Role role3 = new Role(3, ERole.ROLE_ANONYMOUS_USER);
+
+        List<Role> roleList = new ArrayList<>();
+        roleList.add(role1);
+        roleList.add(role2);
+        roleList.add(role3);
+
+        this.roleRepository.saveAll(roleList);
     }
 }

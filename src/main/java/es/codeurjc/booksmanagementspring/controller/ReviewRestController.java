@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -32,6 +33,7 @@ public class ReviewRestController {
             @ApiResponse(responseCode = "200", description = "reviews found",
                     content = { @Content(mediaType = "application/json",
                             array = @ArraySchema( schema = @Schema(implementation = ReviewDTO.class))) })})
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/")
     public ResponseEntity<Page<ReviewDTO>> getReviews(Pageable pageable) {
         return ResponseEntity.ok(reviewService.findAll(pageable));
@@ -44,6 +46,7 @@ public class ReviewRestController {
                             schema = @Schema(implementation = ReviewDTO.class)) }),
             @ApiResponse(responseCode = "404", description = "review not found",
                     content = @Content) })
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ReviewDTO> getReviewById(@PathVariable long id) {
         return ResponseEntity.ok(reviewService.findById(id));
@@ -54,6 +57,7 @@ public class ReviewRestController {
             @ApiResponse(responseCode = "201", description = "review created",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ReviewDTO.class)) })})
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/")
     public ResponseEntity<ReviewDTO> createReview(@RequestBody ReviewCreateDTO reviewCreateDTO) {
         ReviewDTO reviewDTO = reviewService.save(reviewCreateDTO);
@@ -68,6 +72,7 @@ public class ReviewRestController {
                             schema = @Schema(implementation = ReviewDTO.class)) }),
             @ApiResponse(responseCode = "404", description = "review not found",
                     content = @Content) })
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ReviewDTO> replaceReview(@RequestBody ReviewCreateDTO reviewDTO, @PathVariable long id) {
         return ResponseEntity.ok(reviewService.replace(reviewDTO, id));
@@ -80,6 +85,7 @@ public class ReviewRestController {
                             schema = @Schema(implementation = ReviewDTO.class)) }),
             @ApiResponse(responseCode = "404", description = "review not found",
                     content = @Content) })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ReviewDTO> deleteReview(@PathVariable long id) {
         return ResponseEntity.ok(reviewService.delete(id));

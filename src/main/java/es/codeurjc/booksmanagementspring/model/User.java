@@ -1,32 +1,58 @@
 package es.codeurjc.booksmanagementspring.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.SessionScope;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
+@Table(name = "User",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "username"),
+                @UniqueConstraint(columnNames = "email")
+        })
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private String nick;
+    @NotBlank
+    @Size(max = 20)
+    private String username;
+    @NotBlank
+    @Size(max = 50)
+    @Email
     private String email;
+    @NotBlank
+    @Size(max = 120)
+    private String password;
 
     @OneToMany(mappedBy="username", cascade = CascadeType.REMOVE)
     List<Review> reviews;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(  name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
     public User(){}
 
-    public User(String nick, String email){
+    public User(String username, String email){
         super();
-        this.nick = nick;
+        this.username = username;
         this.email = email;
         this.reviews = new ArrayList<>();
+    }
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
     public long getId() {
@@ -37,12 +63,12 @@ public class User {
         this.id = id;
     }
 
-    public String getNick() {
-        return nick;
+    public String getUsername() {
+        return username;
     }
 
-    public void setNick(String nick) {
-        this.nick = nick;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -65,9 +91,25 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", nick='" + nick + '\'' +
+                ", nick='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", reviews=" + reviews +
                 '}';
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }
